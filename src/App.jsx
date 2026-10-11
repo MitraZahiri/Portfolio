@@ -1,221 +1,166 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
-import MuseumCanvas from './components/MuseumCanvas'
-import MuseumHUD from './components/MuseumHUD'
-import MiniMap from './components/MiniMap'
-import ArtworkModal from './components/ArtworkModal'
-import GuestbookModal from './components/GuestbookModal'
-import IntroScreen from './components/IntroScreen'
-import { MUSEUM_ROOMS } from './data/museumData'
-import { audioEngine } from './utils/audioEngine'
+import { useState } from 'react'
+import MuseumScene from './components/MuseumScene'
+import { EXHIBITS } from './data/exhibitsData'
+import { Sparkles, X, ExternalLink, ArrowDown } from 'lucide-react'
 import './index.css'
 
 export default function App() {
-  const [hasEntered, setHasEntered] = useState(false)
-  const [scrollProgress, setScrollProgress] = useState(0)
-  const [activeRoom, setActiveRoom] = useState(MUSEUM_ROOMS[0])
-  const [autoTour, setAutoTour] = useState(false)
-  const [soundEnabled, setSoundEnabled] = useState(false)
-  const [isInspecting, setIsInspecting] = useState(false)
-  const [inspectedExhibit, setInspectedExhibit] = useState(null)
-  const [isMiniMapOpen, setIsMiniMapOpen] = useState(false)
-  const [isGuestbookOpen, setIsGuestbookOpen] = useState(false)
+  const [selectedExhibit, setSelectedExhibit] = useState(null)
+  const [depthMeter, setDepthMeter] = useState('0.0')
+  const [scrollPercent, setScrollPercent] = useState(0)
 
-  // Touch gesture tracking
-  const touchStartYRef = useRef(0)
-  const autoTourAnimRef = useRef(null)
-
-  // 1. Enter Museum Handler
-  const handleEnterMuseum = () => {
-    setHasEntered(true)
-    const isAudioOn = audioEngine.toggleSound()
-    setSoundEnabled(isAudioOn)
-    audioEngine.playTransitionChime(1)
-  }
-
-  // 2. Sound Toggle
-  const handleToggleSound = () => {
-    const isAudioOn = audioEngine.toggleSound()
-    setSoundEnabled(isAudioOn)
-  }
-
-  // 3. Smooth Wheel Navigation along Museum Rail
-  const handleWheel = useCallback(
-    (e) => {
-      if (isInspecting || isGuestbookOpen) return
-      // Turn off auto-tour if user manually scrolls
-      if (autoTour) setAutoTour(false)
-
-      const delta = e.deltaY * 0.00045
-      setScrollProgress((prev) => {
-        const next = Math.max(0, Math.min(1, prev + delta))
-        return next
-      })
-    },
-    [isInspecting, isGuestbookOpen, autoTour]
-  )
-
-  // 4. Touch Navigation for mobile/tablets
-  const handleTouchStart = (e) => {
-    if (e.touches && e.touches[0]) {
-      touchStartYRef.current = e.touches[0].clientY
-    }
-  }
-
-  const handleTouchMove = useCallback(
-    (e) => {
-      if (isInspecting || isGuestbookOpen) return
-      if (!e.touches || !e.touches[0]) return
-      if (autoTour) setAutoTour(false)
-
-      const currentY = e.touches[0].clientY
-      const deltaY = (touchStartYRef.current - currentY) * 0.0018
-      touchStartYRef.current = currentY
-
-      setScrollProgress((prev) => Math.max(0, Math.min(1, prev + deltaY)))
-    },
-    [isInspecting, isGuestbookOpen, autoTour]
-  )
-
-  // 5. Keyboard Navigation
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (isInspecting || isGuestbookOpen) return
-
-      if (e.key === 'ArrowDown' || e.key === 'KeyS' || e.key === 'PageDown') {
-        setScrollProgress((prev) => Math.min(1, prev + 0.035))
-        if (autoTour) setAutoTour(false)
-      } else if (e.key === 'ArrowUp' || e.key === 'KeyW' || e.key === 'PageUp') {
-        setScrollProgress((prev) => Math.max(0, prev - 0.035))
-        if (autoTour) setAutoTour(false)
-      } else if (e.key === ' ' || e.code === 'Space') {
-        e.preventDefault()
-        setAutoTour((prev) => !prev)
-      } else if (e.key === 'm' || e.key === 'M') {
-        handleToggleSound()
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [isInspecting, isGuestbookOpen, autoTour])
-
-  // Attach wheel and touch event listeners
-  useEffect(() => {
-    window.addEventListener('wheel', handleWheel, { passive: true })
-    window.addEventListener('touchstart', handleTouchStart, { passive: true })
-    window.addEventListener('touchmove', handleTouchMove, { passive: true })
-
-    return () => {
-      window.removeEventListener('wheel', handleWheel)
-      window.removeEventListener('touchstart', handleTouchStart)
-      window.removeEventListener('touchmove', handleTouchMove)
-    }
-  }, [handleWheel, handleTouchMove])
-
-  // 6. Auto-Tour Playback Loop
-  useEffect(() => {
-    if (autoTour && !isInspecting) {
-      const stepTour = () => {
-        setScrollProgress((prev) => {
-          if (prev >= 1) {
-            setAutoTour(false)
-            return 1
-          }
-          return prev + 0.00035
-        })
-        autoTourAnimRef.current = requestAnimationFrame(stepTour)
-      }
-      autoTourAnimRef.current = requestAnimationFrame(stepTour)
-    } else {
-      cancelAnimationFrame(autoTourAnimRef.current)
-    }
-
-    return () => cancelAnimationFrame(autoTourAnimRef.current)
-  }, [autoTour, isInspecting])
-
-  // 7. Jump to specific room from HUD or Mini-Map
-  const handleJumpToRoom = (room) => {
-    // Map room index (1 to 6) to approximate scrollProgress (0 to 1)
-    const roomProgressMap = {
-      rotunda: 0.0,
-      masterpieces: 0.21,
-      artifacts: 0.41,
-      chronicles: 0.61,
-      ethos: 0.79,
-      salon: 0.98,
-    }
-    const target = roomProgressMap[room.id] ?? 0
-    setScrollProgress(target)
-    setActiveRoom(room)
-    audioEngine.playTransitionChime(room.index)
-  }
-
-  // 8. Exhibit selection (inspection modal)
-  const handleExhibitSelect = (data) => {
-    setInspectedExhibit(data)
-    setIsInspecting(true)
-    if (autoTour) setAutoTour(false)
-  }
-
-  const handleCloseInspect = () => {
-    setIsInspecting(false)
-    setInspectedExhibit(null)
+  // Kamera derinliği ve scroll ilerlemesini güncelle
+  const handleScrollProgress = (offset, cameraZ) => {
+    setScrollPercent(Math.round(offset * 100))
+    setDepthMeter(Math.abs(cameraZ).toFixed(1))
   }
 
   return (
-    <div className="museum-experience-root">
-      {/* 3D WebGL Canvas Layer */}
-      <MuseumCanvas
-        scrollProgress={scrollProgress}
-        onRoomChange={setActiveRoom}
-        onExhibitSelect={handleExhibitSelect}
-        isInspecting={isInspecting}
-        inspectedExhibit={inspectedExhibit}
-        onCloseInspect={handleCloseInspect}
-        autoTour={autoTour}
+    <main className="antigravity-museum-app">
+      {/* 3D Yerçekimsiz R3F Sahnesi */}
+      <MuseumScene
+        onSelectExhibit={(exhibit) => setSelectedExhibit(exhibit)}
+        onScrollProgress={handleScrollProgress}
       />
 
-      {/* Intro Screen Overlay (Shows on initial load) */}
-      {!hasEntered && <IntroScreen onEnter={handleEnterMuseum} />}
+      {/* =========================================================
+          MİNİMALİST HUD (HEADS-UP DISPLAY) KATMANI
+         ========================================================= */}
+      <div className="museum-hud-layer">
+        {/* Üst Navigasyon ve Telemetri Çubuğu */}
+        <header className="hud-header">
+          <div className="museum-logo">
+            <span className="logo-symbol">AG</span>
+            <div className="logo-meta">
+              <h1 className="logo-title">ANTIGRAVITY MUSEUM</h1>
+              <p className="logo-sub">YERÇEKİMSİZ 3D PORTFOLYO</p>
+            </div>
+          </div>
 
-      {/* Immersive HUD Overlay */}
-      {hasEntered && (
-        <MuseumHUD
-          activeRoom={activeRoom}
-          scrollProgress={scrollProgress}
-          onJumpToRoom={handleJumpToRoom}
-          autoTour={autoTour}
-          onToggleAutoTour={() => setAutoTour((prev) => !prev)}
-          soundEnabled={soundEnabled}
-          onToggleSound={handleToggleSound}
-          onOpenGuestbook={() => setIsGuestbookOpen(true)}
-          onToggleMiniMap={() => setIsMiniMapOpen((prev) => !prev)}
-          isMiniMapOpen={isMiniMapOpen}
-        />
-      )}
+          <div className="telemetry-box">
+            <span className="pulse-indicator" />
+            <span className="telemetry-label">DERİNLİK:</span>
+            <span className="telemetry-val">-{depthMeter}m</span>
+            <span className="divider">/</span>
+            <span className="telemetry-pct">%{scrollPercent} KEŞİF</span>
+          </div>
+        </header>
 
-      {/* Mini-Map Floorplan Radar Modal */}
-      {isMiniMapOpen && (
-        <MiniMap
-          activeRoom={activeRoom}
-          scrollProgress={scrollProgress}
-          onJumpToRoom={handleJumpToRoom}
-          onClose={() => setIsMiniMapOpen(false)}
-        />
-      )}
+        {/* Sağ Kenar İlerleme Çubuğu */}
+        <div className="depth-rail-track" aria-hidden="true">
+          <div
+            className="depth-rail-thumb"
+            style={{ height: `${Math.max(6, scrollPercent)}%` }}
+          />
+        </div>
 
-      {/* Artwork Inspection Modal */}
-      {isInspecting && (
-        <ArtworkModal
-          exhibit={inspectedExhibit}
-          onClose={handleCloseInspect}
-        />
-      )}
+        {/* Alt Bilgi ve Gezinti Rehberi */}
+        <footer className="hud-footer">
+          <div className="footer-exhibits-list">
+            {EXHIBITS.map((item, idx) => (
+              <span
+                key={item.id}
+                className="exhibit-pill"
+                onClick={() => setSelectedExhibit(item)}
+              >
+                <span className="pill-num">0{idx + 1}</span>
+                <span className="pill-name">{item.title}</span>
+              </span>
+            ))}
+          </div>
 
-      {/* Curator Guestbook & Inquiries Salon Modal */}
-      {isGuestbookOpen && (
-        <GuestbookModal onClose={() => setIsGuestbookOpen(false)} />
+          <div className="scroll-hint-bar">
+            <span>AŞAĞI KAYDIR VE UZAYDA SÜZÜL</span>
+            <ArrowDown size={14} className="bounce-arrow" />
+          </div>
+        </footer>
+      </div>
+
+      {/* =========================================================
+          ESER İNCELEME MODALI (SEÇİLDİĞİNDE AÇILIR)
+         ========================================================= */}
+      {selectedExhibit && (
+        <div
+          className="exhibit-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setSelectedExhibit(null)}
+        >
+          <article
+            className="exhibit-modal-card"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              borderColor: selectedExhibit.glowColor,
+              boxShadow: `0 0 50px rgba(0, 0, 0, 0.9), 0 0 35px ${selectedExhibit.color}40`,
+            }}
+          >
+            <button
+              type="button"
+              className="modal-close-button"
+              onClick={() => setSelectedExhibit(null)}
+              aria-label="Kapat"
+            >
+              <X size={18} />
+              <span>ESC</span>
+            </button>
+
+            <div className="modal-header">
+              <span
+                className="modal-number-badge"
+                style={{ color: selectedExhibit.glowColor }}
+              >
+                ESER // NO. {selectedExhibit.number}
+              </span>
+              <h2 className="modal-title">{selectedExhibit.title}</h2>
+              <p className="modal-subtitle">{selectedExhibit.subtitle}</p>
+            </div>
+
+            <div className="modal-body">
+              <p className="modal-desc">{selectedExhibit.description}</p>
+
+              <div className="modal-tech-box">
+                <span className="section-label">UZMANLIK ALANI & KATEGORİ</span>
+                <div className="tech-badge-row">
+                  <span
+                    className="tech-badge"
+                    style={{
+                      borderColor: `${selectedExhibit.glowColor}60`,
+                      color: selectedExhibit.glowColor,
+                    }}
+                  >
+                    <Sparkles size={12} />
+                    {selectedExhibit.category}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <footer className="modal-footer">
+              <button
+                type="button"
+                className="action-btn"
+                style={{
+                  backgroundColor: selectedExhibit.color,
+                  color: '#05070d',
+                }}
+                onClick={() => setSelectedExhibit(null)}
+              >
+                <span>MÜZEYE DÖN</span>
+              </button>
+
+              <a
+                href="https://github.com/MitraZahiri/Portfolio"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="github-btn"
+              >
+                <ExternalLink size={15} />
+                <span>GITHUB PROJESİ</span>
+              </a>
+            </footer>
+          </article>
+        </div>
       )}
-    </div>
+    </main>
   )
 }
