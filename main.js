@@ -957,6 +957,85 @@ const scrollPercentage = document.getElementById('scroll-percentage');
 const navNodes = document.querySelectorAll('.nav-node');
 const tourBtn = document.getElementById('tour-btn');
 
+// Atmosphere Lighting Presets (Void, Dusk, Neo)
+const ATMOSPHERES = [
+  {
+    name: 'VOID',
+    bg: '#050609',
+    fog: '#050609',
+    ambient: '#101524',
+    portal: '#ffe8c2',
+  },
+  {
+    name: 'DUSK',
+    bg: '#180c08',
+    fog: '#180c08',
+    ambient: '#3a1e12',
+    portal: '#ff9858',
+  },
+  {
+    name: 'NEO',
+    bg: '#040d12',
+    fog: '#040d12',
+    ambient: '#06262e',
+    portal: '#38efc6',
+  },
+];
+
+let currentAtmosphereIdx = 0;
+const atmosphereBtn = document.getElementById('atmosphere-btn');
+const atmosphereLabel = document.getElementById('atmosphere-label');
+
+if (atmosphereBtn) {
+  atmosphereBtn.addEventListener('click', () => {
+    currentAtmosphereIdx = (currentAtmosphereIdx + 1) % ATMOSPHERES.length;
+    const preset = ATMOSPHERES[currentAtmosphereIdx];
+
+    if (atmosphereLabel) {
+      atmosphereLabel.textContent = preset.name;
+    }
+
+    const targetBg = new THREE.Color(preset.bg);
+    const targetFog = new THREE.Color(preset.fog);
+    const targetAmbient = new THREE.Color(preset.ambient);
+    const targetPortal = new THREE.Color(preset.portal);
+
+    gsap.to(scene.background, {
+      r: targetBg.r,
+      g: targetBg.g,
+      b: targetBg.b,
+      duration: 1.2,
+      ease: 'power2.out',
+    });
+
+    gsap.to(scene.fog.color, {
+      r: targetFog.r,
+      g: targetFog.g,
+      b: targetFog.b,
+      duration: 1.2,
+      ease: 'power2.out',
+    });
+
+    gsap.to(ambientLight.color, {
+      r: targetAmbient.r,
+      g: targetAmbient.g,
+      b: targetAmbient.b,
+      duration: 1.2,
+      ease: 'power2.out',
+    });
+
+    gsap.to(portalBeam.color, {
+      r: targetPortal.r,
+      g: targetPortal.g,
+      b: targetPortal.b,
+      duration: 1.2,
+      ease: 'power2.out',
+    });
+
+    playAcousticChime(currentAtmosphereIdx + 2);
+  });
+}
+
 function toggleAutoTour() {
   isAutoTour = !isAutoTour;
   if (tourBtn) {
