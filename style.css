@@ -1,0 +1,512 @@
+:root {
+  --bg-dark: #050505;
+  --bg-card: rgba(14, 16, 24, 0.82);
+  --bg-card-border: rgba(212, 175, 55, 0.28);
+  --gold-primary: #d4af37;
+  --gold-bright: #fcd34d;
+  --gold-glow: rgba(212, 175, 55, 0.35);
+  --text-primary: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+
+  --font-serif: 'Cinzel', Georgia, serif;
+  --font-mono: 'Space Grotesk', monospace;
+  --font-sans: 'Inter', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+}
+
+/* 3D WebGL Tuval Taşıyıcısı */
+#webgl-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+
+/* =========================================================
+   FPS CROSSHAIR / NİŞANGAH
+========================================================= */
+#crosshair {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 40;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, opacity 0.3s ease;
+}
+
+.crosshair-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.85);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.crosshair-ring {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: scale(0.6);
+  opacity: 0;
+}
+
+/* Eserin üzerine gelindiğinde nişangah büyümesi */
+#crosshair.active .crosshair-dot {
+  background-color: var(--gold-bright);
+  box-shadow: 0 0 10px var(--gold-bright);
+  transform: scale(1.6);
+}
+
+#crosshair.active .crosshair-ring {
+  opacity: 1;
+  transform: scale(1.2);
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 15px var(--gold-glow);
+}
+
+/* =========================================================
+   ÜST HUD TELEMETRİSİ
+========================================================= */
+#hud-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 32px;
+  pointer-events: none;
+}
+
+.hud-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.hud-monogram {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--bg-card-border);
+  background: rgba(14, 16, 24, 0.7);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--gold-primary);
+  box-shadow: 0 0 18px var(--gold-glow);
+}
+
+.hud-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hud-name {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: #ffffff;
+}
+
+.hud-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  color: var(--gold-primary);
+}
+
+.hud-telemetry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(14px);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+}
+
+.telemetry-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold-primary);
+  box-shadow: 0 0 8px var(--gold-primary);
+  animation: pulseBeacon 2s infinite ease-in-out;
+}
+
+/* =========================================================
+   GİRİŞ / BAŞLANGIÇ EKRANI (HTML OVERLAY)
+========================================================= */
+#intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, #111422 0%, #040507 90%);
+  padding: 24px;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
+}
+
+#intro-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.intro-card {
+  max-width: 680px;
+  width: 90%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  animation: fadeInCard 1s ease-out;
+}
+
+.intro-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  color: var(--gold-primary);
+  padding: 4px 12px;
+  border: 1px solid var(--bg-card-border);
+  border-radius: 999px;
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.intro-title {
+  font-family: var(--font-serif);
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #ffffff;
+  line-height: 1.2;
+  text-shadow: 0 0 40px rgba(212, 175, 55, 0.25);
+}
+
+.intro-subtitle {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  max-width: 580px;
+}
+
+.intro-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 220px;
+  margin: 6px 0;
+}
+
+.divider-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--bg-card-border), transparent);
+}
+
+.divider-diamond {
+  width: 6px;
+  height: 6px;
+  background: var(--gold-primary);
+  transform: rotate(45deg);
+}
+
+.start-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 38px;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.22) 0%, rgba(212, 175, 55, 0.06) 100%);
+  border: 1px solid var(--gold-primary);
+  border-radius: 2px;
+  color: #ffffff;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: pulseButton 2.8s infinite ease-in-out;
+}
+
+.start-button:hover {
+  background: var(--gold-primary);
+  color: #050505;
+  box-shadow: 0 0 45px rgba(212, 175, 55, 0.6);
+  transform: translateY(-2px);
+}
+
+.start-button .arrow-icon {
+  transition: transform 0.3s ease;
+}
+
+.start-button:hover .arrow-icon {
+  transform: translateX(4px);
+}
+
+.controls-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  margin-top: 8px;
+}
+
+.controls-pill strong {
+  color: var(--gold-primary);
+  font-weight: 600;
+}
+
+/* =========================================================
+   ESER BİLGİ KARTI (GSAP İLE ANİMASYONLANIR)
+========================================================= */
+.exhibit-card {
+  position: fixed;
+  bottom: 32px;
+  left: 32px;
+  max-width: 440px;
+  width: calc(100% - 64px);
+  z-index: 50;
+  pointer-events: auto;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(24px);
+}
+
+.card-inner {
+  background: var(--bg-card);
+  border: 1px solid var(--bg-card-border);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 35px var(--gold-glow);
+  backdrop-filter: blur(20px);
+  border-radius: 4px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  color: var(--gold-primary);
+  font-weight: 600;
+}
+
+.card-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold-bright);
+  box-shadow: 0 0 10px var(--gold-bright);
+}
+
+.card-title {
+  font-family: var(--font-serif);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  line-height: 1.25;
+}
+
+.card-subtitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--gold-bright);
+}
+
+.card-desc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.card-tech-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.tech-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.25em;
+  color: var(--text-dim);
+}
+
+.tech-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tech-badge-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--text-primary);
+}
+
+.card-curator-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  padding-top: 4px;
+}
+
+.note-prefix {
+  color: var(--gold-primary);
+}
+
+/* =========================================================
+   ALT KONTROL VE İPUCU BARI
+========================================================= */
+#controls-hint {
+  position: fixed;
+  bottom: 24px;
+  right: 32px;
+  z-index: 30;
+  pointer-events: none;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--text-dim);
+  padding: 8px 16px;
+  background: rgba(14, 16, 24, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+}
+
+/* =========================================================
+   ANİMASYONLAR
+========================================================= */
+@keyframes fadeInCard {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseBeacon {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.4);
+    opacity: 1;
+  }
+}
+
+@keyframes pulseButton {
+  0%,
+  100% {
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 45px rgba(212, 175, 55, 0.55);
+  }
+}
+
+/* Responsive Düzenlemeler */
+@media (max-width: 768px) {
+  #hud-header {
+    padding: 16px 20px;
+  }
+  .hud-tag {
+    display: none;
+  }
+  .intro-title {
+    font-size: 28px;
+  }
+  .controls-pill {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .exhibit-card {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    width: auto;
+  }
+  #controls-hint {
+    display: none;
+  }
+}

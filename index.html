@@ -1,19 +1,123 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="tr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mitra Zahiri — The Museum of Code & Creative Engineering</title>
-    <meta name="description" content="An immersive 3D virtual museum portfolio by Mitra Zahiri. Journey through architectural gallery halls exploring creative development, WebGL experiences, and full-stack masterpieces." />
-    
-    <!-- Preconnect to Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Italiana&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>Mitra Zahiri — Digital Museum</title>
+    <meta
+      name="description"
+      content="Mitra Zahiri'nin 3D Sanal Müze Portfolyosu. FPS kamera kontrolleri (WASD + Fare), karanlık minimalist mimari ve etkileşimli sergi alanları."
+    />
+
+    <!-- Google Fonts: Cinzel (Başlıklar), Space Grotesk (Teknik veriler), Inter (Gövde metinleri) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- CSS Stilleri -->
+    <link rel="stylesheet" href="./style.css" />
+
+    <!-- Three.js ve GSAP CDN Importmap (Modern ES6 Modülleri) -->
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+          "gsap": "https://unpkg.com/gsap@3.12.5/index.js"
+        }
+      }
+    </script>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <!-- 3D WebGL Canvas Konteyneri -->
+    <div id="webgl-container"></div>
+
+    <!-- FPS Hedef Noktası (Crosshair / Reticle) -->
+    <div id="crosshair">
+      <div class="crosshair-dot"></div>
+      <div class="crosshair-ring"></div>
+    </div>
+
+    <!-- Üst Minimalist HUD (Telemetri & Kimlik) -->
+    <header id="hud-header">
+      <div class="hud-brand">
+        <span class="hud-monogram">MZ</span>
+        <div class="hud-title-group">
+          <span class="hud-name">MITRA ZAHIRI</span>
+          <span class="hud-tag">DIGITAL MUSEUM // ARCHIVE</span>
+        </div>
+      </div>
+      <div class="hud-telemetry">
+        <span class="telemetry-dot"></span>
+        <span id="telemetry-coords">X: 0.0 | Z: 0.0</span>
+      </div>
+    </header>
+
+    <!-- Giriş / Başlangıç Ekranı (HTML Overlay) -->
+    <div id="intro-overlay">
+      <div class="intro-card">
+        <div class="intro-badge">SANAL MİMARİ VE SERGİ</div>
+        <h1 class="intro-title">Mitra Zahiri — Digital Museum</h1>
+        <p class="intro-subtitle">
+          UI/UX Tasarım • Vektörel Kurumsal Kimlik • Gömülü Sistemler (C++, ESP32) • Mobil Uygulama (Flutter/Dart)
+        </p>
+
+        <div class="intro-divider">
+          <span class="divider-line"></span>
+          <span class="divider-diamond"></span>
+          <span class="divider-line"></span>
+        </div>
+
+        <button type="button" id="start-btn" class="start-button">
+          <span>Deneyime başlamak için tıklayın</span>
+          <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </button>
+
+        <div class="controls-pill">
+          <span><strong>[W, A, S, D]</strong> Yürü</span>
+          <span>•</span>
+          <span><strong>[FARE]</strong> Etrafa Bak</span>
+          <span>•</span>
+          <span><strong>[ESC]</strong> İmleci Serbest Bırak</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Eser Bilgi Kartı (Raycaster ile yaklaşıldığında GSAP ile açılır) -->
+    <aside id="exhibit-card" class="exhibit-card">
+      <div class="card-inner">
+        <div class="card-header">
+          <span id="card-badge" class="card-badge">SERGİ NO. 01</span>
+          <div class="card-status-dot"></div>
+        </div>
+
+        <h2 id="card-title" class="card-title">PROJE ADI</h2>
+        <p id="card-subtitle" class="card-subtitle">Alt başlık veya kategori</p>
+        <p id="card-desc" class="card-desc">Proje açıklaması buraya gelecek.</p>
+
+        <div class="card-tech-section">
+          <span class="tech-label">KULLANILAN TEKNOLOJİLER</span>
+          <div id="card-tech-list" class="tech-badges"></div>
+        </div>
+
+        <div class="card-curator-note">
+          <span class="note-prefix">KÜRATÖR NOTU:</span>
+          <span id="card-curator">Mitra Zahiri Özel Koleksiyonu</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Alt Navigasyon / Kontrol İpucu -->
+    <div id="controls-hint">
+      <span>Eserlerin üzerine nişan alarak detaylı bilgi kartını görüntüleyin</span>
+    </div>
+
+    <!-- Ana JavaScript Modülü -->
+    <script type="module" src="./main.js"></script>
   </body>
 </html>
