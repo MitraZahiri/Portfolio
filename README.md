@@ -16,15 +16,7 @@
 
 ---
 
-## 🎨 Curated Exhibits & Works
 
-1. **RĀY OS**: AI-Powered Pocket Olfactory Scanner *(Embedded Systems, C++, ESP32, TinyML, Hardware Architecture)*
-2. **PooSHoo**: Smart Pet-Care Hardware & Flutter Companion App *(Flutter, Dart, Bluetooth Low Energy BLE, IoT Architecture)*
-3. **Ideal Systems**: Corporate Identity & Monolithic Logo Architecture *(Adobe Illustrator, Brand Identity, Vector Geometry)*
-4. **Windmill Brand**: Modern Corporate Identity & Artisan Packaging *(Logo Design, Visual Identity, Typography, Sustainable Packaging)*
-5. **Karekok Publications**: National Exam Prep Book Cover Series (TYT / AYT / LGS) *(Book Cover Design, Editorial Grid, Mathematical Tessellation Art)*
-
----
 
 ## 🎮 Navigation & Controls
 
