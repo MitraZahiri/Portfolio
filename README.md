@@ -1,6 +1,7 @@
 # Mitra Zahiri — Digital Museum (3D Virtual Portfolio)
 
-> An immersive 3D digital museum and interactive portfolio inspired by the architectural minimalism and dark atmosphere of **Sébastien Lempens**.
+> An immersive 3D digital museum and interactive portfolio showcasing the creative technology and design archive of **Mitra Zahiri**.
+> Inspired by the architectural minimalism and dark atmosphere of **Sébastien Lempens**.
 > Engineered with WebGL, Three.js, GSAP, and Web Audio API.
 
 ---
@@ -33,53 +34,18 @@
 
 ---
 
-## 📁 Repository Structure
+## 🔒 Intellectual Property & Copyright Notice
 
-```
-├── index.html       # Semantic HTML5 structure, fonts, CDN importmap, HUD & dossier
-├── style.css        # Luxury dark design system, glassmorphism, responsive styles
-├── main.js          # Three.js 3D gallery, smooth scroll rail, raycasting, audio
-├── .gitignore       # Production rules excluding build artifacts and node_modules
-├── package.json     # Vite setup, scripts, and dependencies
-└── README.md        # Exhibition documentation & guide
-```
+**Copyright © 2026 Mitra Zahiri. All Rights Reserved.**
+
+This repository is the personal creative portfolio and official showcase of **Mitra Zahiri**. All design systems, 3D architectural scenes, shaders, brand assets, and creative works presented here are proprietary intellectual property.
+
+- **Strictly Proprietary**: No individual or entity may clone, copy, redistribute, mirror, reproduce, or produce derivative works from this repository, in whole or in part, without prior written authorization from Mitra Zahiri.
+- **Official Showcase Only**: Published strictly for portfolio review, curatorial exhibition, and professional evaluation.
 
 ---
 
-## 🖼️ Adding Custom Artwork Images
-
-Each exhibit in `main.js` (`EXHIBITS_DATA`) includes an `imageUrl` property ready for your assets:
-
-```javascript
-// Example:
-{
-  id: 'ray-os',
-  title: 'RĀY OS',
-  // ...
-  imageUrl: './public/assets/ray-os.jpg', // Set your image path here
-}
-```
-
-When no image URL is provided, the gallery automatically generates high-resolution procedural canvas artworks displaying geometric monolith compositions.
-
----
-
-## 🚀 Quick Start
-
-### Development Server:
-```bash
-npm run dev
-```
-Open `http://localhost:5173` in your browser.
-
-### Production Build:
-```bash
-npm run build
-```
-
----
-
-## 👤 Curator & Developer
+## 👤 Curator & Creator
 
 - **Mitra Zahiri**: [github.com/MitraZahiri](https://github.com/MitraZahiri)
-- **Repository**: [github.com/MitraZahiri/Portfolio](https://github.com/MitraZahiri/Portfolio)
+- **Portfolio Repository**: [github.com/MitraZahiri/Portfolio](https://github.com/MitraZahiri/Portfolio)
