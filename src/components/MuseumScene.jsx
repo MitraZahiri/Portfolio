@@ -12,17 +12,17 @@ import {
 import { EXHIBITS } from '../data/exhibitsData'
 
 // ========================================================
-// 1. KAMERA SCROLL VE UÇUŞ KONTROLCÜSÜ (CameraRig)
+// 1. CAMERA SCROLL & FLIGHT CONTROLLER (CameraRig)
 // ========================================================
 function CameraRig({ onScrollUpdate }) {
   const scroll = useScroll()
 
   useFrame((state, delta) => {
-    // scroll.offset (0 ile 1 arası): Kamerayı Z-ekseninde derinliklere uçurur
+    // scroll.offset (0 to 1): Propels camera along Z-axis gallery depth
     const offset = scroll.offset
     const targetZ = 4 - offset * 52
 
-    // Akıcı kamera interpolasyonu (lerp / damp)
+    // Smooth camera interpolation (lerp / damp)
     state.camera.position.z = THREE.MathUtils.damp(
       state.camera.position.z,
       targetZ,
@@ -30,7 +30,7 @@ function CameraRig({ onScrollUpdate }) {
       delta
     )
 
-    // Fare hareketine bağlı hafif yerçekimsiz süzülme (Mouse Parallax)
+    // Subtle zero-gravity floating based on mouse parallax
     state.camera.position.x = THREE.MathUtils.damp(
       state.camera.position.x,
       state.pointer.x * 1.4,
@@ -44,7 +44,7 @@ function CameraRig({ onScrollUpdate }) {
       delta
     )
 
-    // Kameranın baktığı açıya çok hafif dinamik eğim
+    // Dynamic tilt angle
     state.camera.rotation.y = THREE.MathUtils.damp(
       state.camera.rotation.y,
       -state.pointer.x * 0.08,
@@ -67,7 +67,7 @@ function CameraRig({ onScrollUpdate }) {
 }
 
 // ========================================================
-// 2. YERÇEKİMSİZ SÜZÜLEN ESER ÇERÇEVESİ (ExhibitFrame)
+// 2. ZERO-GRAVITY FLOATING EXHIBIT FRAME (ExhibitFrame)
 // ========================================================
 function ExhibitFrame({ exhibit, onSelect }) {
   const [hovered, setHovered] = useState(false)
@@ -77,7 +77,7 @@ function ExhibitFrame({ exhibit, onSelect }) {
 
   useFrame((_, delta) => {
     if (meshRef.current) {
-      // Hover durumunda yumuşak yaylanma / büyüme efekti
+      // Soft hover scaling effect
       const targetScale = hovered ? 1.06 : 1.0
       meshRef.current.scale.x = THREE.MathUtils.damp(
         meshRef.current.scale.x,
@@ -106,14 +106,14 @@ function ExhibitFrame({ exhibit, onSelect }) {
       position={exhibit.position}
       rotation={exhibit.rotation}
     >
-      {/* Drei <Float>: Uzay boşluğunda yavaş süzülme ve hafif rotasyon */}
+      {/* Drei <Float>: Gentle floating glide in 3D void */}
       <Float
         speed={1.6}
         rotationIntensity={0.5}
         floatIntensity={0.9}
         floatingRange={[-0.15, 0.15]}
       >
-        {/* Dramatik Eser Spot Işığı: Çerçevenin üzerine odaklanır */}
+        {/* Overhead Focused Artwork SpotLight */}
         <SpotLight
           position={[0, 3.5, 2.5]}
           angle={0.48}
@@ -124,7 +124,7 @@ function ExhibitFrame({ exhibit, onSelect }) {
           castShadow
         />
 
-        {/* Ana Çerçeve Meshi */}
+        {/* Main Frame Mesh */}
         <group
           ref={meshRef}
           onPointerOver={(e) => {
@@ -141,7 +141,7 @@ function ExhibitFrame({ exhibit, onSelect }) {
             onSelect(exhibit)
           }}
         >
-          {/* Dış Çerçeve Gövdesi */}
+          {/* Outer Frame Chassis */}
           <mesh castShadow receiveShadow>
             <boxGeometry args={[3.8, 2.5, 0.16]} />
             <meshStandardMaterial
@@ -153,7 +153,7 @@ function ExhibitFrame({ exhibit, onSelect }) {
             />
           </mesh>
 
-          {/* Parlayan Çerçeve Kenarlığı (Emissive Hover Efekti) */}
+          {/* Gilded Bevel Edge Frame (Emissive Glow on Hover) */}
           <mesh ref={rimRef} position={[0, 0, 0.085]}>
             <boxGeometry args={[3.86, 2.56, 0.02]} />
             <meshStandardMaterial
@@ -165,7 +165,7 @@ function ExhibitFrame({ exhibit, onSelect }) {
             />
           </mesh>
 
-          {/* İç Sanat / Monolitik Tuval */}
+          {/* Monolithic Artwork Canvas */}
           <mesh position={[0, 0, 0.09]}>
             <planeGeometry args={[3.5, 2.2]} />
             <meshPhysicalMaterial
@@ -179,7 +179,7 @@ function ExhibitFrame({ exhibit, onSelect }) {
             />
           </mesh>
 
-          {/* Dönen Geometrik Yörünge Halkası (Hover olduğunda canlanır) */}
+          {/* Orbiting Orbital Ring (Active on Hover) */}
           {hovered && (
             <mesh rotation={[Math.PI / 4, 0, 0]} position={[0, 0, 0.1]}>
               <ringGeometry args={[2.2, 2.23, 64]} />
@@ -192,7 +192,7 @@ function ExhibitFrame({ exhibit, onSelect }) {
             </mesh>
           )}
 
-          {/* 3D Eser Numarası */}
+          {/* 3D Exhibit Number */}
           <Text
             position={[-1.45, 0.85, 0.11]}
             fontSize={0.16}
@@ -204,7 +204,7 @@ function ExhibitFrame({ exhibit, onSelect }) {
             {`NO. ${exhibit.number}`}
           </Text>
 
-          {/* 3D Eser Başlığı */}
+          {/* 3D Exhibit Title */}
           <Text
             position={[0, 0.15, 0.12]}
             fontSize={0.34}
@@ -216,7 +216,7 @@ function ExhibitFrame({ exhibit, onSelect }) {
             {exhibit.title}
           </Text>
 
-          {/* 3D Alt Başlık / Tanım */}
+          {/* 3D Exhibit Subtitle */}
           <Text
             position={[0, -0.32, 0.12]}
             fontSize={0.13}
@@ -230,7 +230,7 @@ function ExhibitFrame({ exhibit, onSelect }) {
             {exhibit.subtitle}
           </Text>
 
-          {/* 3D Kategori Etiketi */}
+          {/* 3D Category Badge */}
           <Text
             position={[0, -0.78, 0.12]}
             fontSize={0.095}
@@ -248,7 +248,7 @@ function ExhibitFrame({ exhibit, onSelect }) {
 }
 
 // ========================================================
-// 3. ANA 3D SAHNE BİLEŞENİ (MuseumScene)
+// 3. MAIN 3D SCENE COMPONENT (MuseumScene)
 // ========================================================
 export default function MuseumScene({ onSelectExhibit, onScrollProgress }) {
   return (
@@ -273,14 +273,14 @@ export default function MuseumScene({ onSelectExhibit, onScrollProgress }) {
         }}
         shadows
       >
-        {/* Sonsuz Derinlik Veren Karanlık Arka Plan ve Sis */}
+        {/* Infinite Depth Dark Atmosphere & Fog */}
         <color attach="background" args={['#040508']} />
         <fog attach="fog" args={['#040508', 3, 38]} />
 
-        {/* Minimalist ve Soğuk Ortam Işığı */}
+        {/* Minimalist Ambient Light */}
         <ambientLight intensity={0.4} color="#0d111d" />
 
-        {/* Uzay Boşluğunda Süzülen Mikro Kozmik Parçacıklar */}
+        {/* Floating Golden Atmospheric Sparkles */}
         <Sparkles
           count={220}
           scale={[28, 28, 70]}
@@ -290,12 +290,10 @@ export default function MuseumScene({ onSelectExhibit, onScrollProgress }) {
           opacity={0.5}
         />
 
-        {/* Drei <ScrollControls>: Fare tekerleğiyle Z ekseninde uçuş */}
+        {/* Drei <ScrollControls>: Smooth scroll through Z-axis */}
         <ScrollControls pages={5} damping={0.25} distance={1}>
-          {/* Kamerayı Z ekseni boyunca sürükleyen motor */}
           <CameraRig onScrollUpdate={onScrollProgress} />
 
-          {/* 5 Özgün Portfolyo Eserinin Yerçekimsiz Boşluktaki Dizilimi */}
           {EXHIBITS.map((exhibit) => (
             <ExhibitFrame
               key={exhibit.id}

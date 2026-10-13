@@ -1,90 +1,93 @@
-# Mitra Zahiri — Digital Museum (3D FPS Virtual Portfolio)
+# Mitra Zahiri — Digital Museum (3D Virtual Portfolio)
 
-> **Sébastien Lempens** atmosferinden ilham alan, birinci şahıs (FPS) kamerası ile gezilebilen, karanlık ve minimalist 3D sanal müze portfolyosu.
-> WebGL, Three.js, PointerLockControls ve GSAP mimarisiyle inşa edilmiştir.
-
----
-
-## 🏛️ Mimari ve Atmosfer Özellikleri
-
-- **Karanlık Minimalizm**: Derin siyah zemin (`#050505`) ve sonsuzluk hissi veren üstel sis (`THREE.FogExp2`).
-- **Yansıtıcı Islak Zemin**: Spot ışıklarını ve tabloları yansıtan, düşük pürüzlülüklü ve yüksek metalikliğe sahip cilalı cam/beton zemin.
-- **FPS Gezinti Mekaniği**: `W-A-S-D` tuşları, sürtünmeli ivmelenme (momentum/damping) ve gerçekçi yürüme kafa sarsıntısı (head bobbing).
-- **Çarpışma Tespiti (Collision)**: Duvarların ve sergi bloklarının içinden geçilmesini önleyen dinamik sınır denetimi (`BoundingBox`).
-- **Raycaster & GSAP Etkileşimi**: Kullanıcı merkezdeki nişangahla bir esere baktığında ekranın sol alt köşesinde beliren zarif HTML bilgi kartı.
-- **Dramatik Aydınlatma**: Her bir eserin üzerine yukarıdan vuran konik `SpotLight` spot ışıkları ve havada süzülen altın toz partikülleri.
+> An immersive 3D digital museum and interactive portfolio inspired by the architectural minimalism and dark atmosphere of **Sébastien Lempens**.
+> Engineered with WebGL, Three.js, GSAP, and Web Audio API.
 
 ---
 
-## 🎨 Sergilenen Eserler / Projeler
+## 🏛️ Architectural & Atmospheric Features
 
-1. **RĀY OS**: AI Destekli Cep Boy Koku Tarayıcı (Gömülü Donanım, C++, ESP32, TinyML)
-2. **PooSHoo**: Akıllı Fiziksel Cihaz ve Flutter Mobil Uygulaması (Flutter, Dart, BLE, IoT)
-3. **İdeal Bilişim**: Kurumsal Kimlik ve Özgün Logo Tasarımı (Illustrator, Vektör Marka Mimarisi)
-4. **Yel Değirmeni**: Modern Kurumsal Logo Tasarımı (Tipografi, Geometrik Minimalizm)
-5. **Karekök Yayınları**: TYT, AYT ve LGS Soru Bankası Kapak Tasarımları (Yayıncılık & Büyük Ölçekli Baskı)
+- **Dark Minimalism**: Deep void atmosphere (`#06070a`) with atmospheric exponential fog (`THREE.FogExp2`).
+- **Reflective Obsidian Floor**: Mirror-like polished floor reflecting overhead spotlight cones, floating plinths, and artworks.
+- **Smooth Scroll & Mouse Drag Rail**: Free, unobstructed mouse navigation powered by normalized wheel mechanics, inertia drag strolling, and interactive progress rail scrubbing.
+- **Floating Anthracite Plinths**: 5 custom monolith exhibition blocks showcasing framed artworks with gilded bevel trims.
+- **Raycaster & GSAP Curatorial Dossier**: Seamless hover and click interaction that highlights exhibits with an emissive aura and opens a detailed project dossier.
+- **Generative Ambient Soundscape**: Native Web Audio API synthesizer generating calming low-frequency binaural drones and harmonic acoustic chimes with zero external audio assets.
 
 ---
 
-## 🎮 Kontroller
+## 🎨 Curated Exhibits & Works
 
-| Tuş | Eylem |
+1. **RĀY OS**: AI-Powered Pocket Olfactory Scanner *(Embedded Systems, C++, ESP32, TinyML, Hardware Architecture)*
+2. **PooSHoo**: Smart Pet-Care Hardware & Flutter Companion App *(Flutter, Dart, Bluetooth Low Energy BLE, IoT Architecture)*
+3. **Ideal Systems**: Corporate Identity & Monolithic Logo Architecture *(Adobe Illustrator, Brand Identity, Vector Geometry)*
+4. **Windmill Brand**: Modern Corporate Identity & Artisan Packaging *(Logo Design, Visual Identity, Typography, Sustainable Packaging)*
+5. **Karekok Publications**: National Exam Prep Book Cover Series (TYT / AYT / LGS) *(Book Cover Design, Editorial Grid, Mathematical Tessellation Art)*
+
+---
+
+## 🎮 Navigation & Controls
+
+| Control | Action |
 | :--- | :--- |
-| **W / Yukarı Ok** | İleri Yürü |
-| **S / Aşağı Ok** | Geri Yürü |
-| **A / Sol Ok** | Sola Adımla (Strafe) |
-| **D / Sağ Ok** | Sağa Adımla (Strafe) |
-| **Fare** | 360° Etrafa Bak |
-| **ESC** | Fare İmlecini Serbest Bırak |
+| **Mouse Wheel / Trackpad** | Smooth glide forward & backward through gallery halls |
+| **Click & Drag Mouse** | Stroll freely through the exhibition with momentum |
+| **Hover on Artwork** | Glow highlight & reveal curatorial dossier |
+| **Click Artwork / Wing** | Glide directly into close focus in front of the exhibit |
+| **Right Progress Rail** | Click or drag thumb to scrub anywhere in the gallery |
+| **Arrow Up / Down or W / S** | Step forward / backward along the camera rail |
+| **Sound Button** | Toggle generative ambient soundscape |
+| **Auto-Tour** | Automated guided glide across all wings |
 
 ---
 
-## 📁 Proje Dosya Yapısı
+## 📁 Repository Structure
 
 ```
-├── index.html       # HTML yapısı, Google Fonts, CDN importmap, HUD & bilgi kartı
-├── style.css        # Awwwards-tier lüks karanlık tema ve HUD stilleri
-├── main.js          # Three.js sahnesi, FPS kamera, fizik, çarpışma ve GSAP etkileşimi
-├── .gitignore       # React/Node.js için optimize edilmiş kurallar
-└── package.json     # Proje bağımlılıkları ve Vite yapılandırması
+├── index.html       # Semantic HTML5 structure, fonts, CDN importmap, HUD & dossier
+├── style.css        # Luxury dark design system, glassmorphism, responsive styles
+├── main.js          # Three.js 3D gallery, smooth scroll rail, raycasting, audio
+├── .gitignore       # Production rules excluding build artifacts and node_modules
+├── package.json     # Vite setup, scripts, and dependencies
+└── README.md        # Exhibition documentation & guide
 ```
 
 ---
 
-## 🖼️ Kendi Görsellerinizi Ekleme (TODO Rehberi)
+## 🖼️ Adding Custom Artwork Images
 
-`main.js` içerisindeki `EXHIBITS_DATA` dizisinde her eser için `imageUrl` alanı ayrılmıştır. Görsel eklemek için:
+Each exhibit in `main.js` (`EXHIBITS_DATA`) includes an `imageUrl` property ready for your assets:
 
 ```javascript
-// Örnek:
+// Example:
 {
   id: 'ray-os',
   title: 'RĀY OS',
   // ...
-  imageUrl: './public/assets/ray-os.jpg', // TODO: Buraya görsel yolunu yazın
+  imageUrl: './public/assets/ray-os.jpg', // Set your image path here
 }
 ```
 
-Görsel atanmadığında sistem otomatik olarak yüksek çözünürlüklü prosedürel sanatsal tuval grafiklerini üretip görüntüler.
+When no image URL is provided, the gallery automatically generates high-resolution procedural canvas artworks displaying geometric monolith compositions.
 
 ---
 
-## 🚀 Hızlı Başlangıç
+## 🚀 Quick Start
 
-### Geliştirme Sunucusu:
+### Development Server:
 ```bash
 npm run dev
 ```
-Tarayıcınızda `http://localhost:5173` adresine gidin.
+Open `http://localhost:5173` in your browser.
 
-### Üretim (Build):
+### Production Build:
 ```bash
 npm run build
 ```
 
 ---
 
-## 👤 Küratör & Geliştirici
+## 👤 Curator & Developer
 
 - **Mitra Zahiri**: [github.com/MitraZahiri](https://github.com/MitraZahiri)
-- **Depo**: [github.com/MitraZahiri/Portfolio](https://github.com/MitraZahiri/Portfolio)
+- **Repository**: [github.com/MitraZahiri/Portfolio](https://github.com/MitraZahiri/Portfolio)

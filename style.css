@@ -1,9 +1,9 @@
 :root {
-  --bg-dark: #050505;
-  --bg-card: rgba(14, 16, 24, 0.82);
+  --bg-void: #06070a;
+  --bg-card: rgba(12, 15, 24, 0.84);
   --bg-card-border: rgba(212, 175, 55, 0.28);
   --gold-primary: #d4af37;
-  --gold-bright: #fcd34d;
+  --gold-bright: #fbbf24;
   --gold-glow: rgba(212, 175, 55, 0.35);
   --text-primary: #f8fafc;
   --text-muted: #94a3b8;
@@ -29,82 +29,78 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: var(--bg-dark);
+  background-color: var(--bg-void);
   color: var(--text-primary);
   font-family: var(--font-sans);
+  cursor: grab;
 }
 
-/* 3D WebGL Tuval Taşıyıcısı */
+body.is-dragging {
+  cursor: grabbing !important;
+}
+
+/* 3D WebGL Canvas Wrapper */
 #webgl-container {
   position: fixed;
   inset: 0;
   width: 100vw;
   height: 100vh;
   z-index: 1;
+  cursor: inherit;
 }
 
 /* =========================================================
-   FPS CROSSHAIR / NİŞANGAH
+   CUSTOM LUXURY CURSOR
 ========================================================= */
-#crosshair {
+#cursor-dot {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 40;
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease, opacity 0.3s ease;
-}
-
-.crosshair-dot {
-  width: 4px;
-  height: 4px;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.85);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.crosshair-ring {
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  transform: scale(0.6);
-  opacity: 0;
-}
-
-/* Eserin üzerine gelindiğinde nişangah büyümesi */
-#crosshair.active .crosshair-dot {
   background-color: var(--gold-bright);
   box-shadow: 0 0 10px var(--gold-bright);
-  transform: scale(1.6);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.05s ease-out;
 }
 
-#crosshair.active .crosshair-ring {
-  opacity: 1;
-  transform: scale(1.2);
+#cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: width 0.25s ease, height 0.25s ease, border-color 0.25s ease;
+}
+
+body.cursor-hover #cursor-ring {
+  width: 52px;
+  height: 52px;
   border-color: var(--gold-primary);
-  box-shadow: 0 0 15px var(--gold-glow);
+  background-color: rgba(212, 175, 55, 0.08);
 }
 
 /* =========================================================
-   ÜST HUD TELEMETRİSİ
+   TOP HUD NAVIGATION BAR
 ========================================================= */
 #hud-header {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 30;
+  z-index: 50;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 32px;
+  padding: 24px 36px;
   pointer-events: none;
 }
 
@@ -112,15 +108,16 @@ body {
   display: flex;
   align-items: center;
   gap: 14px;
+  pointer-events: auto;
 }
 
 .hud-monogram {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   border: 1px solid var(--bg-card-border);
-  background: rgba(14, 16, 24, 0.7);
-  backdrop-filter: blur(12px);
+  background: rgba(14, 18, 28, 0.7);
+  backdrop-filter: blur(14px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -128,7 +125,7 @@ body {
   font-weight: 700;
   font-size: 13px;
   color: var(--gold-primary);
-  box-shadow: 0 0 18px var(--gold-glow);
+  box-shadow: 0 0 20px var(--gold-glow);
 }
 
 .hud-title-group {
@@ -152,173 +149,243 @@ body {
   color: var(--gold-primary);
 }
 
-.hud-telemetry {
+/* Center Telemetry Pill */
+.hud-center-telemetry {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 16px;
+  padding: 8px 20px;
   border-radius: 999px;
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(16px);
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.15em;
-  color: var(--text-muted);
+  pointer-events: auto;
 }
 
-.telemetry-dot {
+.live-beacon {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: var(--gold-primary);
-  box-shadow: 0 0 8px var(--gold-primary);
+  box-shadow: 0 0 10px var(--gold-primary);
   animation: pulseBeacon 2s infinite ease-in-out;
 }
 
-/* =========================================================
-   GİRİŞ / BAŞLANGIÇ EKRANI (HTML OVERLAY)
-========================================================= */
-#intro-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle at center, #111422 0%, #040507 90%);
-  padding: 24px;
-  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
+#room-indicator {
+  color: #ffffff;
+  font-weight: 600;
 }
 
-#intro-overlay.hidden {
-  opacity: 0;
-  visibility: hidden;
+.telemetry-divider {
+  color: var(--border-subtle);
+}
+
+#depth-readout {
+  color: var(--gold-bright);
+}
+
+/* Top Right Actions (Sound & Tour) */
+.hud-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.hud-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(14px);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.hud-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--bg-card-border);
+}
+
+.hud-btn.active {
+  border-color: var(--gold-primary);
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--gold-primary);
+}
+
+.tour-btn.playing {
+  background: var(--gold-primary);
+  color: #06070a;
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 20px var(--gold-glow);
+}
+
+/* Sound Bars */
+.sound-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+
+.sound-bars .bar {
+  width: 2px;
+  height: 4px;
+  background-color: var(--gold-primary);
+  border-radius: 1px;
+  transition: height 0.1s ease;
+}
+
+.hud-btn.active .sound-bars .bar:nth-child(1) { animation: bounceBar 0.8s infinite ease-in-out; }
+.hud-btn.active .sound-bars .bar:nth-child(2) { animation: bounceBar 0.6s 0.2s infinite ease-in-out; }
+.hud-btn.active .sound-bars .bar:nth-child(3) { animation: bounceBar 0.9s 0.4s infinite ease-in-out; }
+.hud-btn.active .sound-bars .bar:nth-child(4) { animation: bounceBar 0.7s 0.1s infinite ease-in-out; }
+
+@keyframes bounceBar {
+  0%, 100% { height: 4px; }
+  50% { height: 14px; }
+}
+
+/* =========================================================
+   RIGHT SIDE PROGRESS RAIL TRACK
+========================================================= */
+/* =========================================================
+   RIGHT SIDE PROGRESS RAIL TRACK (CLICKABLE & DRAGGABLE)
+========================================================= */
+#progress-rail {
+  position: fixed;
+  right: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 240px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  z-index: 55;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+#progress-rail:hover {
+  width: 8px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+#progress-thumb {
+  width: 100%;
+  height: 0%;
+  background: var(--gold-bright);
+  box-shadow: 0 0 12px var(--gold-bright);
+  border-radius: 4px;
   pointer-events: none;
 }
 
-.intro-card {
-  max-width: 680px;
-  width: 90%;
-  text-align: center;
+/* =========================================================
+   WELCOME FLOATING BANNER (NON-BLOCKING)
+========================================================= */
+.welcome-banner {
+  position: fixed;
+  top: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 45;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 22px;
-  animation: fadeInCard 1s ease-out;
+  text-align: center;
+  gap: 12px;
+  padding: 22px 36px;
+  background: rgba(12, 15, 24, 0.76);
+  border: 1px solid var(--bg-card-border);
+  border-radius: 12px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px var(--gold-glow);
+  pointer-events: none;
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+  max-width: 640px;
+  width: 90%;
 }
 
-.intro-badge {
+.welcome-banner.faded {
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, -18px);
+}
+
+.welcome-pill {
   font-family: var(--font-mono);
   font-size: 10px;
-  letter-spacing: 0.35em;
+  letter-spacing: 0.3em;
   color: var(--gold-primary);
-  padding: 4px 12px;
+  padding: 4px 14px;
   border: 1px solid var(--bg-card-border);
   border-radius: 999px;
   background: rgba(212, 175, 55, 0.08);
 }
 
-.intro-title {
+.welcome-heading {
   font-family: var(--font-serif);
-  font-size: 40px;
+  font-size: 28px;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   color: #ffffff;
-  line-height: 1.2;
-  text-shadow: 0 0 40px rgba(212, 175, 55, 0.25);
+  line-height: 1.25;
+  text-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
 }
 
-.intro-subtitle {
+.welcome-tagline {
   font-size: 13px;
-  line-height: 1.6;
   color: var(--text-muted);
-  letter-spacing: 0.04em;
-  max-width: 580px;
+  line-height: 1.55;
+  max-width: 540px;
 }
 
-.intro-divider {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  width: 220px;
-  margin: 6px 0;
-}
-
-.divider-line {
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--bg-card-border), transparent);
-}
-
-.divider-diamond {
-  width: 6px;
-  height: 6px;
-  background: var(--gold-primary);
-  transform: rotate(45deg);
-}
-
-.start-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 18px 38px;
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.22) 0%, rgba(212, 175, 55, 0.06) 100%);
-  border: 1px solid var(--gold-primary);
-  border-radius: 2px;
-  color: #ffffff;
-  font-family: var(--font-serif);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  cursor: pointer;
-  box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  animation: pulseButton 2.8s infinite ease-in-out;
-}
-
-.start-button:hover {
-  background: var(--gold-primary);
-  color: #050505;
-  box-shadow: 0 0 45px rgba(212, 175, 55, 0.6);
-  transform: translateY(-2px);
-}
-
-.start-button .arrow-icon {
-  transition: transform 0.3s ease;
-}
-
-.start-button:hover .arrow-icon {
-  transform: translateX(4px);
-}
-
-.controls-pill {
+.welcome-controls-guide {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-top: 4px;
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--text-dim);
-  letter-spacing: 0.1em;
-  margin-top: 8px;
+  color: var(--gold-bright);
 }
 
-.controls-pill strong {
-  color: var(--gold-primary);
+.welcome-controls-guide kbd {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  font-size: 10px;
   font-weight: 600;
 }
 
+.guide-sep {
+  color: var(--border-subtle);
+}
+
 /* =========================================================
-   ESER BİLGİ KARTI (GSAP İLE ANİMASYONLANIR)
+   CURATORIAL EXHIBIT DETAIL DOSSIER (GSAP ANIMATED)
 ========================================================= */
 .exhibit-card {
   position: fixed;
-  bottom: 32px;
-  left: 32px;
-  max-width: 440px;
-  width: calc(100% - 64px);
-  z-index: 50;
+  bottom: 84px;
+  left: 36px;
+  max-width: 460px;
+  width: calc(100% - 72px);
+  z-index: 60;
   pointer-events: auto;
   opacity: 0;
   visibility: hidden;
@@ -328,16 +395,16 @@ body {
 .card-inner {
   background: var(--bg-card);
   border: 1px solid var(--bg-card-border);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 35px var(--gold-glow);
-  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 40px var(--gold-glow);
+  backdrop-filter: blur(22px);
   border-radius: 4px;
-  padding: 28px;
+  padding: 30px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
-.card-header {
+.card-top-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -351,21 +418,27 @@ body {
   font-weight: 600;
 }
 
-.card-status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--gold-bright);
-  box-shadow: 0 0 10px var(--gold-bright);
+.card-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s ease;
+}
+
+.card-close-btn:hover {
+  color: #ffffff;
 }
 
 .card-title {
   font-family: var(--font-serif);
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 700;
   letter-spacing: 0.08em;
   color: #ffffff;
-  line-height: 1.25;
+  line-height: 1.2;
 }
 
 .card-subtitle {
@@ -377,7 +450,7 @@ body {
 
 .card-desc {
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.65;
   color: var(--text-muted);
 }
 
@@ -385,26 +458,24 @@ body {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding-top: 6px;
+  padding-top: 8px;
   border-top: 1px solid var(--border-subtle);
 }
 
-.tech-label {
+.tech-section-label {
   font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: 0.25em;
   color: var(--text-dim);
 }
 
-.tech-badges {
+.tech-badge-container {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-.tech-badge-item {
-  display: inline-flex;
-  align-items: center;
+.tech-badge-pill {
   padding: 4px 10px;
   border-radius: 3px;
   background: rgba(255, 255, 255, 0.04);
@@ -415,98 +486,67 @@ body {
   color: var(--text-primary);
 }
 
-.card-curator-note {
+.card-curator-footer {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 10px;
-  color: var(--text-dim);
-  font-family: var(--font-mono);
-  padding-top: 4px;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-subtle);
 }
 
-.note-prefix {
+.curator-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.curator-label {
   color: var(--gold-primary);
 }
 
-/* =========================================================
-   ALT KONTROL VE İPUCU BARI
-========================================================= */
-#controls-hint {
-  position: fixed;
-  bottom: 24px;
-  right: 32px;
-  z-index: 30;
-  pointer-events: none;
+.card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gold-bright);
+  text-decoration: none;
   font-family: var(--font-mono);
   font-size: 10px;
-  letter-spacing: 0.18em;
-  color: var(--text-dim);
-  padding: 8px 16px;
-  background: rgba(14, 16, 24, 0.6);
-  border: 1px solid var(--border-subtle);
-  border-radius: 999px;
-  backdrop-filter: blur(10px);
+  letter-spacing: 0.1em;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.card-link:hover {
+  color: #ffffff;
 }
 
 /* =========================================================
-   ANİMASYONLAR
+   KEYFRAME ANIMATIONS & BREAKPOINTS
 ========================================================= */
 @keyframes fadeInCard {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes pulseBeacon {
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-  50% {
-    transform: scale(1.4);
-    opacity: 1;
-  }
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.4); opacity: 1; }
 }
 
 @keyframes pulseButton {
-  0%,
-  100% {
-    box-shadow: 0 0 25px rgba(212, 175, 55, 0.25);
-  }
-  50% {
-    box-shadow: 0 0 45px rgba(212, 175, 55, 0.55);
-  }
+  0%, 100% { box-shadow: 0 0 25px rgba(212, 175, 55, 0.25); }
+  50% { box-shadow: 0 0 45px rgba(212, 175, 55, 0.55); }
 }
 
-/* Responsive Düzenlemeler */
-@media (max-width: 768px) {
-  #hud-header {
-    padding: 16px 20px;
-  }
-  .hud-tag {
-    display: none;
-  }
-  .intro-title {
-    font-size: 28px;
-  }
-  .controls-pill {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .exhibit-card {
-    left: 16px;
-    right: 16px;
-    bottom: 16px;
-    width: auto;
-  }
-  #controls-hint {
-    display: none;
-  }
+@media (max-width: 900px) {
+  #hud-header { padding: 16px 20px; }
+  .hud-center-telemetry { display: none; }
+  .exhibits-stepper { display: none; }
+  #hud-footer { padding: 16px 20px; }
+  .intro-title { font-size: 30px; }
+  .exhibit-card { left: 16px; right: 16px; bottom: 70px; width: auto; }
 }

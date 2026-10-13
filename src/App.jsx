@@ -9,7 +9,7 @@ export default function App() {
   const [depthMeter, setDepthMeter] = useState('0.0')
   const [scrollPercent, setScrollPercent] = useState(0)
 
-  // Kamera derinliği ve scroll ilerlemesini güncelle
+  // Update camera depth and scroll progress
   const handleScrollProgress = (offset, cameraZ) => {
     setScrollPercent(Math.round(offset * 100))
     setDepthMeter(Math.abs(cameraZ).toFixed(1))
@@ -17,36 +17,36 @@ export default function App() {
 
   return (
     <main className="antigravity-museum-app">
-      {/* 3D Yerçekimsiz R3F Sahnesi */}
+      {/* 3D Antigravity R3F Scene */}
       <MuseumScene
         onSelectExhibit={(exhibit) => setSelectedExhibit(exhibit)}
         onScrollProgress={handleScrollProgress}
       />
 
       {/* =========================================================
-          MİNİMALİST HUD (HEADS-UP DISPLAY) KATMANI
+          MINIMALIST HUD (HEADS-UP DISPLAY) LAYER
          ========================================================= */}
       <div className="museum-hud-layer">
-        {/* Üst Navigasyon ve Telemetri Çubuğu */}
+        {/* Top Navigation & Telemetry Bar */}
         <header className="hud-header">
           <div className="museum-logo">
-            <span className="logo-symbol">AG</span>
+            <span className="logo-symbol">MZ</span>
             <div className="logo-meta">
-              <h1 className="logo-title">ANTIGRAVITY MUSEUM</h1>
-              <p className="logo-sub">YERÇEKİMSİZ 3D PORTFOLYO</p>
+              <h1 className="logo-title">MITRA ZAHIRI</h1>
+              <p className="logo-sub">THE DIGITAL MUSEUM</p>
             </div>
           </div>
 
           <div className="telemetry-box">
             <span className="pulse-indicator" />
-            <span className="telemetry-label">DERİNLİK:</span>
+            <span className="telemetry-label">DEPTH:</span>
             <span className="telemetry-val">-{depthMeter}m</span>
             <span className="divider">/</span>
-            <span className="telemetry-pct">%{scrollPercent} KEŞİF</span>
+            <span className="telemetry-pct">{scrollPercent}% EXPLORED</span>
           </div>
         </header>
 
-        {/* Sağ Kenar İlerleme Çubuğu */}
+        {/* Right Depth Rail Track */}
         <div className="depth-rail-track" aria-hidden="true">
           <div
             className="depth-rail-thumb"
@@ -54,7 +54,7 @@ export default function App() {
           />
         </div>
 
-        {/* Alt Bilgi ve Gezinti Rehberi */}
+        {/* Bottom Navigation & Stroll Hint */}
         <footer className="hud-footer">
           <div className="footer-exhibits-list">
             {EXHIBITS.map((item, idx) => (
@@ -70,14 +70,14 @@ export default function App() {
           </div>
 
           <div className="scroll-hint-bar">
-            <span>AŞAĞI KAYDIR VE UZAYDA SÜZÜL</span>
+            <span>SCROLL OR DRAG TO STROLL</span>
             <ArrowDown size={14} className="bounce-arrow" />
           </div>
         </footer>
       </div>
 
       {/* =========================================================
-          ESER İNCELEME MODALI (SEÇİLDİĞİNDE AÇILIR)
+          EXHIBIT CURATORIAL DOSSIER MODAL
          ========================================================= */}
       {selectedExhibit && (
         <div
@@ -98,7 +98,7 @@ export default function App() {
               type="button"
               className="modal-close-button"
               onClick={() => setSelectedExhibit(null)}
-              aria-label="Kapat"
+              aria-label="Close"
             >
               <X size={18} />
               <span>ESC</span>
@@ -109,7 +109,7 @@ export default function App() {
                 className="modal-number-badge"
                 style={{ color: selectedExhibit.glowColor }}
               >
-                ESER // NO. {selectedExhibit.number}
+                EXHIBIT // NO. {selectedExhibit.number}
               </span>
               <h2 className="modal-title">{selectedExhibit.title}</h2>
               <p className="modal-subtitle">{selectedExhibit.subtitle}</p>
@@ -119,7 +119,7 @@ export default function App() {
               <p className="modal-desc">{selectedExhibit.description}</p>
 
               <div className="modal-tech-box">
-                <span className="section-label">UZMANLIK ALANI & KATEGORİ</span>
+                <span className="section-label">CURATORIAL FIELD & DOMAIN</span>
                 <div className="tech-badge-row">
                   <span
                     className="tech-badge"
@@ -145,17 +145,17 @@ export default function App() {
                 }}
                 onClick={() => setSelectedExhibit(null)}
               >
-                <span>MÜZEYE DÖN</span>
+                <span>RETURN TO GALLERY</span>
               </button>
 
               <a
                 href="https://github.com/MitraZahiri/Portfolio"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="github-btn"
+                class="github-btn"
               >
                 <ExternalLink size={15} />
-                <span>GITHUB PROJESİ</span>
+                <span>GITHUB ARCHIVE</span>
               </a>
             </footer>
           </article>

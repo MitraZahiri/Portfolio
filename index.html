@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mitra Zahiri — Digital Museum</title>
     <meta
       name="description"
-      content="Mitra Zahiri'nin 3D Sanal Müze Portfolyosu. FPS kamera kontrolleri (WASD + Fare), karanlık minimalist mimari ve etkileşimli sergi alanları."
+      content="An immersive 3D virtual museum portfolio by Mitra Zahiri. Smooth scroll-driven camera navigation through architectural gallery halls."
     />
 
-    <!-- Google Fonts: Cinzel (Başlıklar), Space Grotesk (Teknik veriler), Inter (Gövde metinleri) -->
+    <!-- Google Fonts: Cinzel, Space Grotesk, Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
-    <!-- CSS Stilleri -->
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="./style.css" />
 
-    <!-- Three.js ve GSAP CDN Importmap (Modern ES6 Modülleri) -->
+    <!-- Three.js and GSAP CDN Importmap (ES6 Modules) -->
     <script type="importmap">
       {
         "imports": {
@@ -32,92 +32,150 @@
     </script>
   </head>
   <body>
-    <!-- 3D WebGL Canvas Konteyneri -->
+    <!-- 3D WebGL Canvas Container -->
     <div id="webgl-container"></div>
 
-    <!-- FPS Hedef Noktası (Crosshair / Reticle) -->
-    <div id="crosshair">
-      <div class="crosshair-dot"></div>
-      <div class="crosshair-ring"></div>
-    </div>
+    <!-- Custom Luxury Cursor -->
+    <div id="cursor-dot"></div>
+    <div id="cursor-ring"></div>
 
-    <!-- Üst Minimalist HUD (Telemetri & Kimlik) -->
+    <!-- Top Minimalist HUD -->
     <header id="hud-header">
       <div class="hud-brand">
         <span class="hud-monogram">MZ</span>
         <div class="hud-title-group">
           <span class="hud-name">MITRA ZAHIRI</span>
-          <span class="hud-tag">DIGITAL MUSEUM // ARCHIVE</span>
+          <span class="hud-tag">THE DIGITAL MUSEUM</span>
         </div>
       </div>
-      <div class="hud-telemetry">
-        <span class="telemetry-dot"></span>
-        <span id="telemetry-coords">X: 0.0 | Z: 0.0</span>
+
+      <div class="hud-center-telemetry">
+        <span class="live-beacon"></span>
+        <span id="room-indicator">HALL 01 // ENTRANCE ROTUNDA</span>
+        <span class="telemetry-divider">/</span>
+        <span id="depth-readout">Z: 0.0m</span>
+      </div>
+
+      <div class="hud-actions">
+        <!-- Generative Ambient Sound Toggle -->
+        <button type="button" id="sound-btn" class="hud-btn" title="Toggle Ambient Audio">
+          <svg id="sound-icon-on" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+          </svg>
+          <div class="sound-bars">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+          </div>
+        </button>
+
+        <!-- Auto-Tour Guided Playback -->
+        <button type="button" id="tour-btn" class="hud-btn tour-btn" title="Auto-Guided Tour">
+          <svg class="play-icon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3" />
+          </svg>
+          <span>AUTO-TOUR</span>
+        </button>
       </div>
     </header>
 
-    <!-- Giriş / Başlangıç Ekranı (HTML Overlay) -->
-    <div id="intro-overlay">
-      <div class="intro-card">
-        <div class="intro-badge">SANAL MİMARİ VE SERGİ</div>
-        <h1 class="intro-title">Mitra Zahiri — Digital Museum</h1>
-        <p class="intro-subtitle">
-          UI/UX Tasarım • Vektörel Kurumsal Kimlik • Gömülü Sistemler (C++, ESP32) • Mobil Uygulama (Flutter/Dart)
-        </p>
+    <!-- Right Side Progress Rail Track -->
+    <div id="progress-rail" aria-hidden="true">
+      <div id="progress-thumb"></div>
+    </div>
 
-        <div class="intro-divider">
-          <span class="divider-line"></span>
-          <span class="divider-diamond"></span>
-          <span class="divider-line"></span>
-        </div>
-
-        <button type="button" id="start-btn" class="start-button">
-          <span>Deneyime başlamak için tıklayın</span>
-          <svg class="arrow-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M5 12h14M12 5l7 7-7 7" />
-          </svg>
-        </button>
-
-        <div class="controls-pill">
-          <span><strong>[W, A, S, D]</strong> Yürü</span>
-          <span>•</span>
-          <span><strong>[FARE]</strong> Etrafa Bak</span>
-          <span>•</span>
-          <span><strong>[ESC]</strong> İmleci Serbest Bırak</span>
-        </div>
+    <!-- Floating Non-Blocking Welcome Card (Fades out seamlessly on scroll) -->
+    <div id="welcome-banner" class="welcome-banner">
+      <div class="welcome-pill">GALLERY ARCHIVE // ARCHITECTURAL VIEW</div>
+      <h1 class="welcome-heading">Mitra Zahiri — Digital Museum</h1>
+      <p class="welcome-tagline">
+        Interactive 3D Virtual Gallery • UI/UX Architecture • Embedded Systems • Flutter Mobile
+      </p>
+      <div class="welcome-controls-guide">
+        <span class="guide-item"><kbd>Scroll</kbd> or <kbd>Drag Mouse</kbd> to stroll</span>
+        <span class="guide-sep">•</span>
+        <span class="guide-item">Hover or Click Artworks to Inspect</span>
       </div>
     </div>
 
-    <!-- Eser Bilgi Kartı (Raycaster ile yaklaşıldığında GSAP ile açılır) -->
+    <!-- Bottom Exhibition Stepper Deck -->
+    <footer id="hud-footer">
+      <nav class="exhibits-stepper" aria-label="Museum Wings Navigation">
+        <button type="button" class="nav-node active" data-progress="0.0">
+          <span class="node-num">00</span>
+          <span class="node-title">Rotunda</span>
+        </button>
+        <button type="button" class="nav-node" data-progress="0.18">
+          <span class="node-num">01</span>
+          <span class="node-title">RĀY OS</span>
+        </button>
+        <button type="button" class="nav-node" data-progress="0.36">
+          <span class="node-num">02</span>
+          <span class="node-title">PooSHoo</span>
+        </button>
+        <button type="button" class="nav-node" data-progress="0.54">
+          <span class="node-num">03</span>
+          <span class="node-title">Ideal Systems</span>
+        </button>
+        <button type="button" class="nav-node" data-progress="0.72">
+          <span class="node-num">04</span>
+          <span class="node-title">Windmill Brand</span>
+        </button>
+        <button type="button" class="nav-node" data-progress="0.88">
+          <span class="node-num">05</span>
+          <span class="node-title">Karekok Archive</span>
+        </button>
+      </nav>
+
+      <div class="scroll-status-box">
+        <span id="scroll-percentage">00%</span>
+        <span class="scroll-hint-label">SCROLL OR DRAG TO EXPLORE</span>
+      </div>
+    </footer>
+
+    <!-- Curatorial Exhibit Detail Dossier (Opens on Hover/Click) -->
     <aside id="exhibit-card" class="exhibit-card">
       <div class="card-inner">
-        <div class="card-header">
-          <span id="card-badge" class="card-badge">SERGİ NO. 01</span>
-          <div class="card-status-dot"></div>
+        <div class="card-top-row">
+          <span id="card-badge" class="card-badge">EXHIBIT NO. 01</span>
+          <button type="button" id="card-close-btn" class="card-close-btn" aria-label="Close Dossier">✕</button>
         </div>
 
-        <h2 id="card-title" class="card-title">PROJE ADI</h2>
-        <p id="card-subtitle" class="card-subtitle">Alt başlık veya kategori</p>
-        <p id="card-desc" class="card-desc">Proje açıklaması buraya gelecek.</p>
+        <h2 id="card-title" class="card-title">PROJECT TITLE</h2>
+        <p id="card-subtitle" class="card-subtitle">Project Domain & Category</p>
+        <p id="card-desc" class="card-desc">Project overview description goes here.</p>
 
         <div class="card-tech-section">
-          <span class="tech-label">KULLANILAN TEKNOLOJİLER</span>
-          <div id="card-tech-list" class="tech-badges"></div>
+          <span class="tech-section-label">MEDIUM & STACK</span>
+          <div id="card-tech-list" class="tech-badge-container"></div>
         </div>
 
-        <div class="card-curator-note">
-          <span class="note-prefix">KÜRATÖR NOTU:</span>
-          <span id="card-curator">Mitra Zahiri Özel Koleksiyonu</span>
+        <div class="card-curator-footer">
+          <div class="curator-meta">
+            <span class="curator-label">CURATORIAL FIELD:</span>
+            <span id="card-curator" class="curator-val">Engineering & Design Archive</span>
+          </div>
+          <a
+            href="https://github.com/MitraZahiri/Portfolio"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="card-link"
+          >
+            <span>GITHUB ARCHIVE</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+              <polyline points="15 3 21 3 21 9" />
+              <line x1="10" y1="14" x2="21" y2="3" />
+            </svg>
+          </a>
         </div>
       </div>
     </aside>
 
-    <!-- Alt Navigasyon / Kontrol İpucu -->
-    <div id="controls-hint">
-      <span>Eserlerin üzerine nişan alarak detaylı bilgi kartını görüntüleyin</span>
-    </div>
-
-    <!-- Ana JavaScript Modülü -->
+    <!-- Main JavaScript Logic -->
     <script type="module" src="./main.js"></script>
   </body>
 </html>
